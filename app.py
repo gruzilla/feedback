@@ -4,6 +4,7 @@ from pymongo.server_api import ServerApi
 from wordcloud import WordCloud
 from PIL import Image
 import io
+import os
 import base64
 
 app = Flask(__name__)
