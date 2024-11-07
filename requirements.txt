@@ -1,0 +1,4 @@
+flask
+pymongo
+wordcloud
+pillow

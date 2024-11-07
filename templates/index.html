@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Word Cloud</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 50px;
+        }
+        #wordcloud {
+            margin-top: 20px;
+            max-width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Live Word Cloud</h1>
+    <form id="textForm">
+        <input type="text" id="textInput" maxlength="80" placeholder="Enter text (max 80 characters)">
+        <button type="submit">Submit</button>
+    </form>
+    <img id="wordcloud" src="" alt="Word Cloud">
+
+    <script>
+        let version = 0;  // Keep track of the current wordcloud version
+
+        // Function to submit text
+        document.getElementById("textForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            let textInput = document.getElementById("textInput").value;
+            fetch("/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "text=" + encodeURIComponent(textInput)
+            }).then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                    document.getElementById("textInput").value = "";
+                }
+            });
+        });
+
+        // Function to refresh word cloud every second if there's a new version
+        function refreshWordCloud() {
+            fetch(`/wordcloud?version=${version}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.image) {  // Only update if there's a new image
+                        document.getElementById("wordcloud").src = "data:image/png;base64," + data.image;
+                        version = data.version;  // Update to the latest version
+                    }
+                });
+        }
+        setInterval(refreshWordCloud, 1000);
+    </script>
+</body>
+</html>

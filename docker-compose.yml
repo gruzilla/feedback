@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+
+  flask_app:
+    build:
+      context: .
+    container_name: flask_container
+    networks:
+      - revproxy
+    environment:
+      - MONGO_URI=${MONGO_URI}  # Load MONGO_URI from .env file
+      - "traefik.enable=true"
+      - "traefik.docker.network=revproxy"
+      - "traefik.http.routers.feedback.rule=Host(`feedback.abendstille.at`)"
+      - "traefik.http.routers.feedback.tls.certresolver=myhttpchallenge"
+
+networks:
+  revproxy:
+    external: true
